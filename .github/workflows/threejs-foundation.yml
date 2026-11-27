@@ -1,0 +1,140 @@
+name: Three.js foundation CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - '.github/workflows/threejs-foundation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Type-check and build Three.js app
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package.json
+      - name: Install dependencies
+        run: npm install
+      - name: Verify character root-motion and jump landing regressions
+        run: npm run test:animation
+      - name: Verify shared hand-painted materials
+        run: npm run test:materials
+      - name: Verify camera occlusion and Idle playback
+        run: npm run test:camera-idle
+      - name: Verify manual desktop/tablet control-mode resolution
+        run: node --experimental-strip-types --test tests/control-mode.test.mjs
+      - name: Generate local alpha-cutout GLB assets
+        run: node scripts/build-painted-trees.mjs
+      - name: Verify unique bark UV islands and painted albedo atlas
+        run: node --test tests/tree-bark-uv.test.mjs
+      - name: Verify packed alpha-cutout GLB, textures and canopy thickness
+        run: node --test tests/painted-tree-glb.test.mjs
+      - name: Verify volumetric UV-painted tree foliage and bark in actual 3D game
+        run: node --experimental-strip-types --test tests/painted-trees.test.mjs
+      - name: Validate reference tropical shade tree, buttress roots and safe garden clearing
+        run: node --experimental-strip-types --test tests/concept-shade-tree.test.mjs
+      - name: Validate supplied painted material quadrants and volumetric foliage UV
+        run: node --experimental-strip-types --test tests/user-reference-textures.test.mjs
+      - name: Verify world grass anti-tile and matching sculpted river meadow UV
+        run: node --experimental-strip-types --test tests/meadow-antitile.test.mjs
+      - name: Verify two-scale painterly riverbank UV, macro blend and no dark decals
+        run: node --experimental-strip-types --test tests/riverbank-painterly-v2.test.mjs
+      - name: Verify actual 3D creek terrain geometry, seamless UV and protected walkways
+        run: node --experimental-strip-types --test tests/home-terrain3d.test.mjs
+      - name: Guard painterly meadow palette, organic trail and fine riverbank grass
+        run: node --experimental-strip-types --test tests/reference-riverside-grass.test.mjs
+      - name: Guard shared warm grass finish without changing farmland, rocks or water
+        run: node --experimental-strip-types --test tests/grass-palette-stage1.test.mjs
+      - name: Verify generated foam atlas, downstream flow and fallback
+        run: node --experimental-strip-types --test tests/foam-flow-atlas.test.mjs
+      - name: Verify painterly terrain, deep riverbanks, wood bridge UV and foam assets
+        run: node --experimental-strip-types --test tests/painterly-landscape.test.mjs
+      - name: Validate original uploaded 3D wooden bridge bytes and fit to walkway
+        run: node --experimental-strip-types --test tests/uploaded-wooden-bridge.test.mjs
+      - name: Validate bridge collision geometry and traversable height profile
+        run: node --experimental-strip-types --test tests/bridge-walk-physics.test.mjs
+      - name: Verify reference-derived bamboo PBR atlas and 3D UV fence geometry
+        run: node --experimental-strip-types --test tests/bamboo-fence.test.mjs
+      - name: Verify childhood home GLB and walkable site
+        run: npm run test:home
+      - name: Verify real moving shadows on painted terrain, house and character
+        run: node --experimental-strip-types --test tests/scene-shadows.test.mjs
+      - name: Verify Stage 5 unified soft daylight, house/fence PBR texture preservation and warm shadows
+        run: node --experimental-strip-types --test tests/daylight-stage5.test.mjs
+      - name: Verify imported GLB ground feather blends seamlessly with home terrain
+        run: node --experimental-strip-types --test tests/house-terrain-seam.test.mjs
+      - name: Verify user-provided UV rock pack and safe environmental placements
+        run: node --experimental-strip-types --test tests/home-rocks.test.mjs
+      - name: Verify creek excavation, clear-water bed and moving ripple shading
+        run: node --experimental-strip-types --test tests/home-creek-depth.test.mjs
+      - name: Verify Stage 3 clear turquoise water, authentic submerged GLBs and localized foam
+        run: node --experimental-strip-types --test tests/clear-river-water-stage3.test.mjs
+      - name: Verify Stage 4 low grassy banks, boulder-only plant accents and warm mossy rock UV
+        run: node --experimental-strip-types --test tests/shore-plants-stage4.test.mjs
+      - name: Verify 3D painterly courtyard vegetation and textured stepping stones
+        run: node --experimental-strip-types --test tests/home-art-pass.test.mjs
+      - name: Verify hand-painted home terrain details and path clearance
+        run: node --experimental-strip-types --test tests/home-ground-details.test.mjs
+      - name: Verify well stone and timber atlas UV isolation
+        run: node --experimental-strip-types --test tests/well-materials.test.mjs
+      - name: Verify modular warung placement, fallback and collision
+        run: npm run test:warung
+      - name: Verify hand-painted terrain, UV tiling and blending
+        run: npm run test:terrain
+      - name: Verify terrain UV1 warping and low-poly instanced grass
+        run: npm run test:terrain-v2
+      - name: Verify screenshot-based dirt albedo and natural grass correction
+        run: npm run test:earth-review
+      - name: Verify native Three.js world JSON round-trip
+        run: node --experimental-strip-types --test tests/world-export.test.mjs
+      - name: Type-check and build
+        run: npm run build
+      - name: Verify production entry point
+        run: test -s dist/index.html
+      - name: Play the farming loop in the production browser build
+        run: npm run test:farm-browser
+      - name: Render and capture the 3D creek, immersed mossy GLBs and timber bridge
+        run: node scripts/check-creek-visual.mjs
+      - name: Save scenic creek screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scenic-creek-reference-v6
+          path: web/artifacts/creek/*.jpg
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Save in-game garden screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: home-garden-gameplay
+          path: web/artifacts/garden/*.jpg
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Save editable Three.js world JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SENARA-World-JSON
+          path: web/artifacts/world/Lembah-Asri-World.json
+          if-no-files-found: ignore
+          retention-days: 7
