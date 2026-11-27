@@ -1,0 +1,66 @@
+name: Build and Deploy SENARA (Three.js)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-senara
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Three.js Web
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout Three.js game
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package.json
+
+      - name: Install dependencies and build
+        working-directory: web
+        run: |
+          npm install
+          npm run build
+          test -s dist/index.html
+
+      - name: Verify farming in the Pages build
+        working-directory: web
+        run: npm run test:farm-browser
+
+      - name: Prepare GitHub Pages package
+        run: |
+          mkdir -p build/pages
+          cp -R web/dist/. build/pages/
+          touch build/pages/.nojekyll
+          test -s build/pages/index.html
+
+      - name: Upload GitHub Pages package
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: build/pages
+
+  deploy:
+    name: Deploy Three.js to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish Three.js game
+        id: deployment
+        uses: actions/deploy-pages@v4
