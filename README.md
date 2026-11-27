@@ -1,5 +1,9 @@
 # SENARA
 
-Three.js game. Active repository; original development history is preserved at eneft/Lembah-Asri.
+Three.js cozy farming adventure. Active game repository; original development history is preserved at eneft/Lembah-Asri.
 
-Migration is validated before importing game assets.
+Development: cd web && npm install && npm run dev.
+
+Asset filenames use lowercase kebab-case; original SHA256 hashes and paths are documented in docs/asset-migration-manifest.json. Standard TypeScript module, entrypoint and configuration names remain intact.
+
+GitHub Pages requires setup in Settings > Pages > GitHub Actions before enabling deployment.
