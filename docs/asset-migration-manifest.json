@@ -1,0 +1,307 @@
+{
+  "source": "eneft/Lembah-Asri",
+  "sourceCommit": "b14abe30c0c71ff9cdee41721429f465750c7524",
+  "assets": [
+    {
+      "old": "web/public/models/character/Idle.fbx",
+      "new": "web/public/models/character/idle.fbx",
+      "sha256": "c5b9c78573c3c1bf6e4b5405d19c5fe0750b8269510717cd663b1b0f0d28c875",
+      "bytes": 14690608
+    },
+    {
+      "old": "web/public/models/character/Jump.fbx",
+      "new": "web/public/models/character/jump.fbx",
+      "sha256": "0a7c950ba48f9e57adce010c754d7b079158eb6fc8a9c60ca57f47d646fd915a",
+      "bytes": 14365344
+    },
+    {
+      "old": "web/public/models/character/Running.fbx",
+      "new": "web/public/models/character/running.fbx",
+      "sha256": "2290d8a1ba642a44bd7bc4b051717d90246c99b751859a2628bfcf1435f300be",
+      "bytes": 14333904
+    },
+    {
+      "old": "web/public/models/character/Walking.fbx",
+      "new": "web/public/models/character/walking.fbx",
+      "sha256": "6c95b8bd1979cffc669512ee2bf45ce7f5cbe5a27b32cc88c5b3945faca0b665",
+      "bytes": 14361120
+    },
+    {
+      "old": "web/public/models/character/shaded.png",
+      "new": "web/public/models/character/character-albedo.png",
+      "sha256": "97426e23480ec321de66f0e8e44a290c1af2aef6d6ea9f2f44698ca3fdde7a66",
+      "bytes": 13665062
+    },
+    {
+      "old": "web/public/models/character/texture_diffuse.png",
+      "new": "web/public/models/character/character-diffuse.png",
+      "sha256": "bd19422f64188e53d042f61c7d2f44ecf64e7497f953693a2e580db48498f53a",
+      "bytes": 13121823
+    },
+    {
+      "old": "web/public/models/character/texture_metallic.png",
+      "new": "web/public/models/character/character-metallic.png",
+      "sha256": "31a29cd447d6983f11dd13230fe85b8a205262233c5e3051bb9223844fef1546",
+      "bytes": 826088
+    },
+    {
+      "old": "web/public/models/character/texture_normal.png",
+      "new": "web/public/models/character/character-normal.png",
+      "sha256": "883a44f7a914aa6ff934e6b9a46e4b10889e99cc92df185156d3864d882469bb",
+      "bytes": 4533619
+    },
+    {
+      "old": "web/public/models/character/texture_pbr.png",
+      "new": "web/public/models/character/character-pbr.png",
+      "sha256": "ae523f7a884b070e304e0b9a29da2f4ca815db32a4a78c947afaf95cbfde7897",
+      "bytes": 2105975
+    },
+    {
+      "old": "web/public/models/character/texture_roughness.png",
+      "new": "web/public/models/character/character-roughness.png",
+      "sha256": "4f3e2321bf892aa11fc47815b35382ebe32ea74b2d0009a2e0e44f257a09898c",
+      "bytes": 866641
+    },
+    {
+      "old": "web/public/models/environment/Rumah_Masa_Kecil.glb",
+      "new": "web/public/models/environment/rumah-masa-kecil.glb",
+      "sha256": "a4a170fb433d87de15e3d832489a33d9bec8dcdf2cf056831096c78655e62240",
+      "bytes": 10300884
+    },
+    {
+      "old": "web/public/models/environment/bridge_user_reference_wood_v1.glb",
+      "new": "web/public/models/environment/bridge-user-reference-wood-v1.glb",
+      "sha256": "6448dde631fdee64a9f9fc19fdde1293f6acc8a9089fa9e62c7d701cd41b8ec2",
+      "bytes": 141908
+    },
+    {
+      "old": "web/public/models/environment/bridge_user_reference_wood_v2.glb",
+      "new": "web/public/models/environment/bridge-user-reference-wood-v2.glb",
+      "sha256": "03ccfdb7b3661e9b9545362c1cd8a824faa9a14a5ec89f5e13de0693c5769531",
+      "bytes": 218288
+    },
+    {
+      "old": "web/public/models/environment/earth_path.png",
+      "new": "web/public/models/environment/earth-path.png",
+      "sha256": "82a46da782915b2daf0cb2ac00bf856e2e1433880661bbae9ebe58cb300dbf72",
+      "bytes": 66645
+    },
+    {
+      "old": "web/public/models/environment/grass_painterly_tile.webp",
+      "new": "web/public/models/environment/grass-painterly-tile.webp",
+      "sha256": "3b7324dc91dba85d7554007178f3436d88980926cb062ed1b7d3a7d41d86a507",
+      "bytes": 6626
+    },
+    {
+      "old": "web/public/models/environment/home-fence-module.glb",
+      "new": "web/public/models/environment/home-fence-module.glb",
+      "sha256": "0b8d911a1fc563ad6e6d4d69c3a59246f7a0e60ca1422a35fa093fbfb772322a",
+      "bytes": 816704
+    },
+    {
+      "old": "web/public/models/environment/lembah_asri_rocks_original_16.glb",
+      "new": "web/public/models/environment/senara-rocks-original-16.glb",
+      "sha256": "bff03f3b0bdccb2dda1acb81aa3dffddd0a63471f9e77816437458c75d513d36",
+      "bytes": 722484
+    },
+    {
+      "old": "web/public/models/environment/pagar_bambu_asri.glb",
+      "new": "web/public/models/environment/pagar-bambu-asri.glb",
+      "sha256": "b0bc695991aa9889876c72d57dc9e1cf2dac88da596d0a7666565e55e3ffd09a",
+      "bytes": 5037328
+    },
+    {
+      "old": "web/public/models/environment/pohon pekarangan.webp",
+      "new": "web/public/models/environment/pohon-pekarangan-atlas.webp",
+      "sha256": "cb73382cae430da2563aeb94a188483d0827a71b0dabb0d418254d567c1d11f4",
+      "bytes": 1340404
+    },
+    {
+      "old": "web/public/models/environment/pohon_pekarangan.glb",
+      "new": "web/public/models/environment/pohon-pekarangan.glb",
+      "sha256": "f073cec066e02658ffcd54009054e7ed97eb4bd8b556031b607027c306af6bb7",
+      "bytes": 2168924
+    },
+    {
+      "old": "web/public/models/environment/rumah_utama.glb",
+      "new": "web/public/models/environment/rumah-utama.glb",
+      "sha256": "248d412f4de2842dd864cc79135d4ba3168fa377ae206ac2a894855950431c3b",
+      "bytes": 4981448
+    },
+    {
+      "old": "web/public/models/environment/rumah_utama_user_pbr.glb",
+      "new": "web/public/models/environment/rumah-utama-user-pbr.glb",
+      "sha256": "5c7c1a91fd934f8c44d62bede6a51abd939b2fb2ce7aefc07c3bf88f52ab9d08",
+      "bytes": 7767560
+    },
+    {
+      "old": "web/public/models/environment/sumur_pekarangan.glb",
+      "new": "web/public/models/environment/sumur-pekarangan.glb",
+      "sha256": "51db7ef2308d2456ceb5de59cea2de1ce1f3c8128c85ecf2f38a03c1b2ff18ed",
+      "bytes": 527484
+    },
+    {
+      "old": "web/public/textures/bridge/bridge_wood_normal.png",
+      "new": "web/public/textures/bridge/bridge-wood-normal.png",
+      "sha256": "7b5ab41b6f9370bb98f2ea73d0c5069f9ce72e19edd1bd72410cb1ce5a2f1899",
+      "bytes": 28488
+    },
+    {
+      "old": "web/public/textures/bridge/bridge_wood_painted.webp",
+      "new": "web/public/textures/bridge/bridge-wood-painted.webp",
+      "sha256": "a59d976bf5c812390fde12af969b3497d9124fbfa0f1adb3f0c61e8a38c8715b",
+      "bytes": 11948
+    },
+    {
+      "old": "web/public/textures/bridge/bridge_wood_roughness.png",
+      "new": "web/public/textures/bridge/bridge-wood-roughness.png",
+      "sha256": "7d2b033d48c2276785681dde43efddaf6a0478eccb013dd40bcf652356d96061",
+      "bytes": 5260
+    },
+    {
+      "old": "web/public/textures/concept/lembah_leaf_pigment.webp",
+      "new": "web/public/textures/concept/senara-leaf-pigment.webp",
+      "sha256": "3aae90654a39a781d249eb159f1c23b7f86d8ca9a7f1e65ecf3c4683b88ea029",
+      "bytes": 2362
+    },
+    {
+      "old": "web/public/textures/concept/lembah_material_atlas.webp",
+      "new": "web/public/textures/concept/senara-material-atlas.webp",
+      "sha256": "be9d2685836b80715ea34d70fc16ca39ed11493023b960610c4fac7ab60e4e62",
+      "bytes": 7458
+    },
+    {
+      "old": "web/public/textures/fence/bamboo_albedo.webp",
+      "new": "web/public/textures/fence/bamboo-albedo.webp",
+      "sha256": "e9e7f50567d4e6540b28bf13da3b32510a35b792816816773fffa6b20591ac2f",
+      "bytes": 17870
+    },
+    {
+      "old": "web/public/textures/fence/bamboo_normal.png",
+      "new": "web/public/textures/fence/bamboo-normal.png",
+      "sha256": "0e4c7d9cd313e66bf5927ec4a4e93c19f479850d8dbfcca1ad169445c51dc72b",
+      "bytes": 54100
+    },
+    {
+      "old": "web/public/textures/fence/bamboo_roughness.png",
+      "new": "web/public/textures/fence/bamboo-roughness.png",
+      "sha256": "be457dcd65491a3a6ac66355f2db38842a803cab8b787e6ad63f86c6685aea66",
+      "bytes": 16093
+    },
+    {
+      "old": "web/public/textures/props/well.webp",
+      "new": "web/public/textures/props/well.webp",
+      "sha256": "71c6f8ce6459413a15ad026f3906df8184eabe0cbf3db024bc65a8a31b670e2e",
+      "bytes": 43552
+    },
+    {
+      "old": "web/public/textures/terrain/chapter_courtyard.webp",
+      "new": "web/public/textures/terrain/chapter-courtyard.webp",
+      "sha256": "c95a4eddb41c9773003b56e16eb9eb56acf77fe6bee4fbd121850181dc99512d",
+      "bytes": 184242
+    },
+    {
+      "old": "web/public/textures/terrain/creek_bank_painted.webp",
+      "new": "web/public/textures/terrain/creek-bank-painted.webp",
+      "sha256": "a00937e847da813f9d89d9dc1e291609c3c30b831246191f1772c426517c70b9",
+      "bytes": 86226
+    },
+    {
+      "old": "web/public/textures/terrain/creek_cobbles.webp",
+      "new": "web/public/textures/terrain/creek-cobbles.webp",
+      "sha256": "a55048129c48a51601f37e3f497649d278879c01a14ef1468a27aac9015da50f",
+      "bytes": 70802
+    },
+    {
+      "old": "web/public/textures/terrain/creek_foam_original_painterly_atlas.png",
+      "new": "web/public/textures/terrain/creek-foam-original-painterly-atlas.png",
+      "sha256": "a8b6ea76b191d9c62125d977514a1ec3c1403d4212710818d604f42045af54ff",
+      "bytes": 9487
+    },
+    {
+      "old": "web/public/textures/terrain/creek_foam_painterly_flow.svg",
+      "new": "web/public/textures/terrain/creek-foam-painterly-flow.svg",
+      "sha256": "e5275b6344b77267a6193399e2c349e30e7ce6c9a5bafd1efd9ae9747502a693",
+      "bytes": 4735
+    },
+    {
+      "old": "web/public/textures/terrain/creek_foam_painterly_restored_v2.png",
+      "new": "web/public/textures/terrain/creek-foam-painterly-restored-v2.png",
+      "sha256": "46ac9cc335f1c6e4fea7d581106fc01c0b101aaece10755871f09615575a4f76",
+      "bytes": 28858
+    },
+    {
+      "old": "web/public/textures/terrain/creek_meadow.webp",
+      "new": "web/public/textures/terrain/creek-meadow.webp",
+      "sha256": "1f14c7769f9c16933619698e99ec72c8ff4e96ea92b5c64cbea75f045af5805d",
+      "bytes": 59492
+    },
+    {
+      "old": "web/public/textures/terrain/creek_water_painted.webp",
+      "new": "web/public/textures/terrain/creek-water-painted.webp",
+      "sha256": "88875d080bf4d719cd1ea3a02295add88abea080dcf31c6a0f61416271cc0336",
+      "bytes": 8088
+    },
+    {
+      "old": "web/public/textures/terrain/creek_water_painterly_illustrated.webp",
+      "new": "web/public/textures/terrain/creek-water-painterly-illustrated.webp",
+      "sha256": "069c085598df845fabdc1152eb2d4dfad034a8a885e9cad90cea5e6d7fbc84e2",
+      "bytes": 34342
+    },
+    {
+      "old": "web/public/textures/terrain/home_courtyard.webp",
+      "new": "web/public/textures/terrain/home-courtyard.webp",
+      "sha256": "4234d632eda12967ed9dbd81e6517c0ecc0d4434ff3532c5e93e5b182579dc6b",
+      "bytes": 171402
+    },
+    {
+      "old": "web/public/textures/terrain/home_garden_rows.webp",
+      "new": "web/public/textures/terrain/home-garden-rows.webp",
+      "sha256": "636f158b8adfcd3dee3e5f5f3a60b2de60410539d25632d133a89abe3332b79c",
+      "bytes": 151856
+    },
+    {
+      "old": "web/public/textures/terrain/home_garden_soil.webp",
+      "new": "web/public/textures/terrain/home-garden-soil.webp",
+      "sha256": "91f222ec102597c0a5b5f3e11e37d8f160f34db1bd16dd0be92b96073d6c6ac7",
+      "bytes": 96018
+    },
+    {
+      "old": "web/public/textures/terrain/island-groves.webp",
+      "new": "web/public/textures/terrain/island-groves.webp",
+      "sha256": "7d2c29c0e4766b0e9cf7320482d3210230ac5c76c28a5490663c3f43ada79485",
+      "bytes": 835778
+    },
+    {
+      "old": "web/public/textures/terrain/island-horizon.webp",
+      "new": "web/public/textures/terrain/island-horizon.webp",
+      "sha256": "5006d0021541fa56b417a83f8861f743577e6bc7efd10f9540c3fe84890bb46d",
+      "bytes": 151018
+    },
+    {
+      "old": "web/public/textures/terrain/north-home-panorama.webp",
+      "new": "web/public/textures/terrain/north-home-panorama.webp",
+      "sha256": "90b13a3691a406841c6f87341aefe20308cb9c7af2b1bfde002736c1dcaa658f",
+      "bytes": 404048
+    },
+    {
+      "old": "web/public/textures/terrain/soil_handpainted.webp",
+      "new": "web/public/textures/terrain/soil-handpainted.webp",
+      "sha256": "be1441b30c1493ecd19c589c1bf39adf6d176a405bfc2331669bccff9ba99e47",
+      "bytes": 84998
+    },
+    {
+      "old": "web/public/textures/terrain/village_grass_painted.webp",
+      "new": "web/public/textures/terrain/village-grass-painted.webp",
+      "sha256": "1f14c7769f9c16933619698e99ec72c8ff4e96ea92b5c64cbea75f045af5805d",
+      "bytes": 59492
+    }
+  ],
+  "generatedNames": {
+    "pohon_rimbun_shade.glb": "pohon-rimbun-shade.glb",
+    "pohon_rimbun_orchard.glb": "pohon-rimbun-orchard.glb",
+    "Walking.json": "walking.json",
+    "Running.json": "running.json",
+    "Jump.json": "jump.json"
+  }
+}

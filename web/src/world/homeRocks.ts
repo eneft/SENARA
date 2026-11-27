@@ -1,0 +1,303 @@
+import { applyPaintedPigment } from './paintedPigment.ts';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { CREEK, creekCenterX, westPoolInset } from './creekCourse.ts';
+
+/**
+ * Curated original rocks supplied for Lembah Asri (base_basic_shaded.glb).
+ *
+ * The compact GLB stores 16 independent mesh varieties. Original UVs and
+ * shaded albedo are preserved; their old all-black baseColorFactor + emissive
+ * texture was rebaked to an ordinary sRGB baseColor map.
+ *
+ * Manual geological placement is deliberately nonuniform:
+ * mossy rocks at wet banks, muted boulders at the foundation, flat pebble
+ * families at yard edges, NEVER on the player's entrance route or stairs.
+ */
+export type RockZone = 'stream' | 'well' | 'foundation' | 'garden' | 'path-edge';
+export type RockType = 'mossy' | 'plain';
+/** Only two of the original 16 UV models are used in-game. */
+export const ROCK_MODELS = Object.freeze({
+  mossy: 0,
+  plain: 2
+} as const);
+export type RockPlacement = Readonly<{
+  type: RockType;
+  x: number; z: number;
+  /** Desired horizontal world-space footprint in metres, not GLB scale. */
+  size: number;
+  yaw: number;
+  zone: RockZone;
+  /** Fraction of world height below water (0..0.5 exposed anchors, >1 entirely underwater). */
+  submerge?: number;
+  /** Centre-channel current breaker, not a shoreline plant anchor. */
+  midstream?: boolean;
+}>;
+/**
+ * Curated natural clusters, no tiny scattered pebbles or stone border.
+ * Mossy rocks stay along the damp banks; dry plain rocks transition into
+ * the well / foundation / path edges. Leave the 7.25–9.95 bridge empty.
+ */
+const rockLayout: readonly RockPlacement[] = [
+  // Upstream: isolated rounded boulder and a smaller partner.
+  { type:'mossy',x:-47.10,z:-3.08,size:1.15,yaw:.38,zone:'stream',submerge:.28 },
+  { type:'mossy',x:-47.78,z:-2.21,size:.57,yaw:1.25,zone:'stream' },
+
+  // Bend near the well: clustered, not evenly spaced stones.
+  { type:'mossy',x:-43.92,z:.78,size:1.27,yaw:1.88,zone:'stream',submerge:.33 },
+  { type:'mossy',x:-43.25,z:1.67,size:.65,yaw:2.36,zone:'stream' },
+  { type:'mossy',x:-43.91,z:4.42,size:1.06,yaw:1.52,zone:'stream',submerge:.20 },
+  { type:'mossy',x:-43.75,z:5.94,size:.72,yaw:2.80,zone:'stream' },
+
+  // Bridge remains clear. Immediately downstream a second natural cluster.
+  { type:'mossy',x:-47.08,z:11.86,size:1.10,yaw:.43,zone:'stream',submerge:.30 },
+  { type:'mossy',x:-47.79,z:12.69,size:.56,yaw:2.14,zone:'stream' },
+  { type:'mossy',x:-43.92,z:14.91,size:1.24,yaw:2.88,zone:'stream',submerge:.37 },
+  { type:'mossy',x:-43.25,z:15.78,size:.65,yaw:.34,zone:'stream' },
+
+  // Downstream: progressively fewer rocks, flow becomes open.
+  { type:'mossy',x:-47.07,z:18.31,size:.84,yaw:1.90,zone:'stream',submerge:.26 },
+  { type:'mossy',x:-43.75,z:22.05,size:1.15,yaw:.98,zone:'stream',submerge:.29 },
+
+  // Small existing UV-painted rocks really UNDER the water surface,
+  // rather than flat stone drawings or extra decal meshes. Same single
+  // InstancedMesh and shader as the exposed mossy rocks.
+  // Leave the bridge/crossing and main swimming-free player route clear.
+  { type:'mossy',x:creekCenterX(-12.6)+.13,z:-12.6,size:.54,yaw:1.02,zone:'stream',submerge:1.07 },
+  { type:'mossy',x:creekCenterX(3.1)-.24,z:3.1,size:.62,yaw:2.22,zone:'stream',submerge:1.08 },
+  { type:'mossy',x:creekCenterX(17.7)+.19,z:17.7,size:.57,yaw:.81,zone:'stream',submerge:1.07 },
+  { type:'mossy',x:creekCenterX(29.4)-.28,z:29.4,size:.50,yaw:1.71,zone:'stream',submerge:1.06 },
+
+  // Four emerged current breakers, separate from the four submerged bed stones.
+  { type:'mossy',x:creekCenterX(-7.6)+.10,z:-7.6,size:.77,yaw:.67,zone:'stream',submerge:.40,midstream:true },
+  { type:'mossy',x:creekCenterX(-.8)-.31,z:-.8,size:.70,yaw:1.91,zone:'stream',submerge:.34,midstream:true },
+  { type:'mossy',x:creekCenterX(5.1)+.08,z:5.1,size:.84,yaw:.52,zone:'stream',submerge:.36,midstream:true },
+  { type:'mossy',x:creekCenterX(16.1)-.22,z:16.1,size:.79,yaw:2.32,zone:'stream',submerge:.39,midstream:true },
+
+  // Plain rocks only on dry ground; never inside water or in front of stairs.
+  { type:'plain',x:-40.63,z:2.51,size:.59,yaw:.67,zone:'well' },
+  { type:'plain',x:-40.60,z:5.91,size:.49,yaw:1.34,zone:'well' },
+  { type:'plain',x:-40.80,z:-3.58,size:.54,yaw:2.42,zone:'foundation' },
+  { type:'plain',x:-25.48,z:-3.42,size:.66,yaw:.65,zone:'foundation' },
+  { type:'plain',x:-22.38,z:4.17,size:.57,yaw:1.05,zone:'garden' },
+  { type:'plain',x:-36.32,z:11.95,size:.50,yaw:1.38,zone:'path-edge' },
+  { type:'plain',x:-21.75,z:12.18,size:.47,yaw:2.88,zone:'path-edge' }
+] as const;
+export const selectedHomeRocks: readonly RockPlacement[] = rockLayout.map(p=>
+  p.zone==='stream' && !p.midstream && p.x < -45.5 && (p.submerge??0)<1
+    ? {...p,x:p.x-2*westPoolInset(p.z)} : p
+);
+export const rockFile = './models/environment/senara-rocks-original-16.glb?rocks=4-two-kinds';
+/**
+ * GLTFLoader sanitizes glTF node names: "LA Rock 00" becomes "LA_Rock_00".
+ * Resolve both source and loaded naming, with originalIndex metadata as an
+ * additional fallback. Never silently render zero rocks.
+ */
+export function findCuratedRockVariant(source: THREE.Object3D, id: number): THREE.Mesh {
+  if (!Number.isInteger(id) || id < 0 || id > 15) {
+    throw new Error('Invalid original rock index: ' + id);
+  }
+  const suffix = String(id).padStart(2, '0');
+  const candidates = [
+    'LA_Rock_' + suffix,
+    'LA Rock ' + suffix,
+    THREE.PropertyBinding.sanitizeNodeName('LA Rock ' + suffix)
+  ];
+  for (const name of candidates) {
+    const mesh = source.getObjectByName(name);
+    if (mesh instanceof THREE.Mesh && mesh.geometry.getAttribute('uv')) return mesh;
+  }
+  let found: THREE.Mesh | undefined;
+  source.traverse(object => {
+    if (found || !(object instanceof THREE.Mesh)) return;
+    const match = /^LA[_ ]Rock[_ ](\d{2})(?:_\d+)?$/.exec(object.name);
+    if ((object.userData.originalIndex === id || (match && Number(match[1]) === id))
+        && object.geometry.getAttribute('uv')) found = object;
+  });
+  if (!found) throw new Error('Original UV rock variant ' + suffix + ' missing after GLTFLoader name sanitization');
+  return found;
+}
+
+let rockSource: Promise<THREE.Group> | undefined;
+export function loadCuratedRockSource(): Promise<THREE.Group> {
+  if (rockSource) return rockSource;
+  rockSource = new GLTFLoader().loadAsync(rockFile)
+    .then(({scene}) => {
+      // Source GLB still retains 16 originals, but only these two are rendered.
+      for (const index of Object.values(ROCK_MODELS)) findCuratedRockVariant(scene, index);
+      console.info('[LembahAsri] Loaded mossy and plain UV rocks');
+      return scene;
+    }).catch(error => {
+      rockSource = undefined;
+      throw error;
+    });
+  return rockSource;
+}
+
+function mossyRiverStone(base: THREE.MeshBasicMaterial): THREE.MeshBasicMaterial {
+  const material=base.clone();
+  material.onBeforeCompile=shader=>{
+    const varying='varying vec3 vRiverStone;\nvarying float vStoneUp;\n';
+    shader.vertexShader=varying+shader.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
+      vRiverStone=(modelMatrix*instanceMatrix*vec4(position,1.)).xyz;
+      vStoneUp=normalize(mat3(instanceMatrix)*normal).y;`);
+    shader.fragmentShader=varying+shader.fragmentShader.replace('#include <color_fragment>', `
+      #include <color_fragment>
+      vec2 face=vRiverStone.xz;
+      float brush=.51*sin(face.x*11.+face.y*7.)+.29*sin(face.x*19.-face.y*23.)+.20*sin(face.y*51.+face.x*33.);
+      float value=dot(diffuseColor.rgb,vec3(.22,.66,.12));
+      // Same UV paint and shape, muted warm grey like the reference.
+      vec3 rock=mix(vec3(.18,.175,.165),vec3(.62,.60,.55),smoothstep(.09,.76,value));
+      float wet=smoothstep(-.22,-.04,vRiverStone.y);
+      // Previously the wet face became conspicuously blue/dark.
+      rock*=mix(vec3(.79,.86,.80),vec3(1.),wet);
+      float moss=smoothstep(.36,.75,vStoneUp+.35*brush)*smoothstep(-.25,.44,brush+.30*sin(face.y*3.1))*smoothstep(-.18,.055,vRiverStone.y);
+      vec3 green=mix(vec3(.15,.23,.10),vec3(.40,.51,.30),clamp(value*1.10+brush*.21,0.,1.));
+      diffuseColor.rgb=mix(rock,green,moss*.72);`);
+  };
+  material.customProgramCacheKey=()=>'river-stone-moss-cap-v2-stage4';
+  material.userData.shoreStoneStyle='warm-grey-soft-moss-stage4-v1';
+  return applyPaintedPigment(material);
+}
+
+export type RockGroundSampler = (x:number,z:number)=>number;
+export const ROCK_GROUND_EMBED=.045;
+const ROCK_GROUND_NAMES=new Set([
+  'Visible gravel bed below clear creek water','Soft west creek bank','Soft east creek bank',
+  'West bank sculpted meadow terrain','East bank sculpted meadow terrain'
+]);
+
+/** Sample only real solid visual terrain, never the water or foam planes. */
+export function createCreekRockGroundSampler(root:THREE.Object3D):RockGroundSampler{
+  const surfaces:THREE.Mesh[]=[];
+  root.updateMatrixWorld(true);
+  root.traverse(o=>{if(o instanceof THREE.Mesh&&ROCK_GROUND_NAMES.has(o.name))surfaces.push(o);});
+  if(!surfaces.some(o=>o.name==='Visible gravel bed below clear creek water'))
+    throw new Error('Creek bed missing for grounded rock placement');
+  const ray=new THREE.Raycaster();
+  const origin=new THREE.Vector3(),down=new THREE.Vector3(0,-1,0);
+  return (x,z)=>{
+    ray.set(origin.set(x,3,z),down);
+    const hit=ray.intersectObjects(surfaces,false)[0];
+    return hit?hit.point.y:0;
+  };
+}
+
+/**
+ * Retain the original upper silhouette and UVs. Midstream exposed rocks may
+ * need more vertical mass to reach their actual bed; submerged rocks must
+ * stay underwater. For all stream rocks, anchor the lower part of the
+ * transformed mesh into the real surface under its footprint.
+ */
+export function placeCreekRock(geometry:THREE.BufferGeometry,p:RockPlacement,scale:number,ground:RockGroundSampler){
+  geometry.computeBoundingBox();
+  const box=geometry.boundingBox!,height=box.max.y-box.min.y;
+  const pos=geometry.getAttribute('position');
+  const centreGround=ground(p.x,p.z);
+  const submerged=(p.submerge??0)>=1;
+  let sy=scale;
+  if(p.midstream){
+    const oldTop=CREEK.waterY+height*scale*(1-(p.submerge??0));
+    const targetTop=THREE.MathUtils.clamp(oldTop,CREEK.waterY+.10,CREEK.waterY+.22);
+    sy=Math.max(scale,(targetTop-centreGround+ROCK_GROUND_EMBED)/height);
+  }else if(submerged){
+    sy=Math.min(scale,Math.max(.035,(CREEK.waterY-.075-centreGround)/height));
+  }
+  const cos=Math.cos(p.yaw),sin=Math.sin(p.yaw);
+  // Probe only the lowest 12% of the actual mesh, not the bounding-box corners.
+  // Deduplicate nearby points to keep initial load cheap on mobile.
+  const samples:{x:number;z:number;dy:number}[]=[];
+  const seen=new Set<string>();
+  for(let i=0;i<pos.count;i++){
+    const dy=pos.getY(i)-box.min.y;
+    if(dy>height*.12+1e-6)continue;
+    const lx=pos.getX(i)*scale,lz=pos.getZ(i)*scale;
+    const x=p.x+cos*lx+sin*lz,z=p.z-sin*lx+cos*lz;
+    const key=Math.round(x*40)+':'+Math.round(z*40)+':'+Math.round(dy*1000);
+    if(seen.has(key))continue;seen.add(key);
+    samples.push({x,z,dy});
+  }
+  if(!samples.length)samples.push({x:p.x,z:p.z,dy:0});
+  const supports=samples.map(v=>({...v,y:ground(v.x,v.z)}));
+  const baseFor=(vertical:number)=>Math.max(...supports.map(v=>v.y-v.dy*vertical))-ROCK_GROUND_EMBED;
+  let base=baseFor(sy);
+  if(submerged&&base+height*sy>CREEK.waterY-.035){
+    sy=Math.max(.001,(CREEK.waterY-.065-base)/height);
+    base=baseFor(sy);
+  }
+  return {y:base-box.min.y*sy,scaleY:sy,base,top:base+height*sy};
+}
+
+export function createCuratedRockGroup(source: THREE.Group, ground:RockGroundSampler): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'Curated original UV textured rock placements';
+  const instance = new THREE.Object3D();
+  const original = findCuratedRockVariant(source, 0);
+  const sourceMaterial = Array.isArray(original.material) ? original.material[0] : original.material;
+  const originalMap = (sourceMaterial as THREE.MeshStandardMaterial).map;
+  if (!originalMap) throw new Error('Rock texture from original shaded file is missing');
+  originalMap.colorSpace = THREE.SRGBColorSpace;
+  originalMap.anisotropy = 4;
+  originalMap.needsUpdate = true;
+  const material = new THREE.MeshBasicMaterial({
+    color: '#ffffff', map: originalMap, toneMapped: false,
+    transparent: false, depthWrite: true, side: THREE.DoubleSide
+  });
+  applyPaintedPigment(material);
+  for (const [type, id] of Object.entries(ROCK_MODELS) as Array<[RockType, number]>) {
+    const placements = selectedHomeRocks.filter(p=>p.type===type);
+    if (!placements.length) continue;
+    const rock = findCuratedRockVariant(source, id);
+    const mesh=new THREE.InstancedMesh(rock.geometry,type==='mossy'?mossyRiverStone(material):material,placements.length);
+    mesh.name='UV '+type+' rock variant '+String(id).padStart(2,'0');
+    const castsShadow=placements.some(p=>p.zone==='stream'||p.zone==='foundation');
+    mesh.castShadow=castsShadow;
+    mesh.receiveShadow=false;
+    // Source pack rocks have very different native sizes (some 8 cm,
+    // others 110 cm). Scale by desired WORLD footprint, never source scale.
+    // This makes a 1.2 m river boulder truly read as a big boulder in-game.
+    rock.geometry.computeBoundingBox();
+    const dimensions = new THREE.Vector3();
+    rock.geometry.boundingBox!.getSize(dimensions);
+    const nativeFootprint = Math.max(dimensions.x, dimensions.z);
+    if (nativeFootprint < 0.02 || !Number.isFinite(nativeFootprint)) {
+      throw new Error('Invalid original rock geometry dimensions '+id);
+    }
+    for(let i=0;i<placements.length;i++){
+      const p=placements[i];
+      const scale = p.size / nativeFootprint;
+      const grounded=p.zone==='stream'?placeCreekRock(rock.geometry,p,scale,ground):null;
+      instance.position.set(p.x,grounded?grounded.y:.022-rock.geometry.boundingBox!.min.y*scale,p.z);
+      instance.rotation.set(0,p.yaw,0);
+      instance.scale.set(scale,grounded?grounded.scaleY:scale,scale);
+      instance.updateMatrix();
+      mesh.setMatrixAt(i,instance.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate=true;
+    mesh.computeBoundingSphere();
+    group.add(mesh);
+  }
+  if (group.children.length !== 2) {
+    throw new Error('Scene must render exactly two UV rock types');
+  }
+  const total = group.children.reduce((count, mesh) => count +
+    (mesh instanceof THREE.InstancedMesh ? mesh.count : 0), 0);
+  if (total !== selectedHomeRocks.length) {
+    throw new Error('Original rock pack placement count mismatch: ' + total);
+  }
+  group.userData.partiallySubmergedRocks=selectedHomeRocks.filter(
+    p=>p.submerge!==undefined && p.submerge<1
+  ).length;
+  group.userData.midstreamBreakers=selectedHomeRocks.filter(p=>p.midstream).length;
+  group.userData.fullySubmergedRocks=selectedHomeRocks.filter(
+    p=>p.submerge!==undefined && p.submerge>=1
+  ).length;
+  return group;
+}
+
+/** Adds only visual assets, without modifying collision or walkable terrain. */
+export async function attachCuratedHomeRocks(root: THREE.Object3D): Promise<boolean> {
+  const source=await loadCuratedRockSource();
+  root.add(createCuratedRockGroup(source,createCreekRockGroundSampler(root)));
+  return true;
+}
